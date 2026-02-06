@@ -57,6 +57,18 @@ pub struct Take<'info> {
 //Transfer tokens from vault to taker
 //Close vault account
 impl<'info> Take<'info> {
+    pub fn enure_5_days_passed(&mut self) -> Result<bool>{
+        const FIVE_DAYS_IN_SECONDS: i64 = 5 * 24 * 60 * 60;
+        
+        let current_time = Clock::get()?.unix_timestamp;
+
+        if (current_time - self.escrow.creation_time) >= FIVE_DAYS_IN_SECONDS {
+            return Ok(true);
+        } else {
+            Ok(false)
+        }
+    }
+    
     pub fn deposit(&mut self) -> Result<()> {
         let cpi_program = self.token_program.to_account_info();
 

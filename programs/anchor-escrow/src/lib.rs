@@ -25,7 +25,11 @@ pub mod anchor_escrow {
     }
 
     pub fn take(ctx: Context<Take>) -> Result<()> {
-        ctx.accounts.deposit()?;
-        ctx.accounts.withdraw_and_close_vault()
+        if ctx.accounts.enure_5_days_passed()? {   
+            ctx.accounts.deposit()?;
+            ctx.accounts.withdraw_and_close_vault()
+        } else {
+            panic!("5 days did not pass");
+        }
     }
 }
