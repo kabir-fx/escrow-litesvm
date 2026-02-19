@@ -2,7 +2,7 @@
 mod tests {
     use {
         anchor_lang::{
-            prelude::msg, solana_program::program_pack::Pack, AccountDeserialize, InstructionData,
+            prelude::msg, solana_program::{program_pack::Pack, clock::Clock}, AccountDeserialize, InstructionData,
             ToAccountMetas,
         },
         anchor_spl::{
@@ -366,6 +366,14 @@ mod tests {
         ctx.program.send_transaction(transaction).unwrap();
         msg!("Make completed");
 
+        // Push the time forward for take to pass
+        let seconds_5_days = (5 * 24 * 60 * 60)+1;
+        let mut clock = ctx.program.get_sysvar::<Clock>();
+        
+        clock.unix_timestamp += seconds_5_days; 
+        
+        ctx.program.set_sysvar::<Clock>(&clock);
+        
         // Step 2: Execute Take instruction
         let take_ix = build_take_instruction(&ctx);
         let message = Message::new(&[take_ix], Some(&ctx.taker.pubkey()));
